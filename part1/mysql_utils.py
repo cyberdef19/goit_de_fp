@@ -1,8 +1,8 @@
 
 from pyspark.sql import DataFrame, SparkSession
-from abc import ABC
+from part1.service import ServiceReader, ServiceWriter
 
-class MySQLOperation(ABC):
+class MySQLOperation:
     
     def __init__(self, 
                  spark: SparkSession,
@@ -19,62 +19,9 @@ class MySQLOperation(ABC):
         self._password = password
         self._spark = spark
     
-    @property
-    def _spark(self)-> SparkSession:
-        return self._spark
     
-    @_spark.setter
-    def _spark(self, value: SparkSession):
-        if not isinstance(value, SparkSession):
-            return
-        self._spark = value
-    
-    @property
-    def _jdbc_url(self)-> str:
-        return self._jdbc_url
-    
-    @_jdbc_url.setter
-    def _jdbc_url(self, value: str):
-        if not isinstance(value, str):
-            return 
-        self._jdbc_url = value
 
-    @property
-    def _jdbc_table(self)-> str:
-        return self._jdbc_table
-
-    @_jdbc_table.setter
-    def _jdbc_table(self, value: str):
-        if not isinstance(value, str):
-            return
-        self._jdbc_table = value
-
-    @property
-    def _username(self)-> str:
-        return self._username
-
-    @_username.setter
-    def _username(self, value: str):
-        if not isinstance(value, str):
-            return
-        self._username = value
-
-    @property
-    def _password(self) -> str:
-        return self._password
-
-    @_password.setter
-    def _password(self, value: str):
-        if not isinstance(value, str):
-            return
-        self._password = value
-    
-    def _spark_read(self)-> DataFrame:
-          ...
-    def _spark_write(self, df: DataFrame, mode: str = "append")-> None:
-          ...
-
-class MySQLReader(MySQLOperation):
+class MySQLReader(MySQLOperation, ServiceReader):
     def _spark_read(self)-> DataFrame:
             return self._spark.read.\
                    format(self._format).\
@@ -84,14 +31,9 @@ class MySQLReader(MySQLOperation):
                    option("password", self._password).\
                    option("driver", "com.mysql.cj.jdbc.Driver").\
                    load()
-        
-    def _spark_write(self, df: DataFrame, mode: str = "append")-> None:
-        raise NotImplementedError("Write operation is not supported in MySQLReader class.")
     
     
-class MySQLWriter(MySQLOperation):
-    def _spark_read(self)-> DataFrame:
-        raise NotImplementedError("Read operation is not supported in MySQLWriter class.")
+class MySQLWriter(MySQLOperation, ServiceWriter):
     
     def _spark_write(self, df: DataFrame, mode: str = "append")-> None:
         df.write.\
