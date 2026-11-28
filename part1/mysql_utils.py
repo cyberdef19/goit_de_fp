@@ -1,6 +1,9 @@
 
 from pyspark.sql import DataFrame, SparkSession
-from part1.service import ServiceReader, ServiceWriter
+try:
+    from .service import ServiceReader, ServiceWriter
+except ImportError:
+    from service import ServiceReader, ServiceWriter
 
 class MySQLOperation:
     
